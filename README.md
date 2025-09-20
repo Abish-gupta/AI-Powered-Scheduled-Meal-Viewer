@@ -44,4 +44,4 @@ Saving **30–40 minutes every day** on meal planning gives me more time for mea
 
 ### 📬 Connect  
 Want to see the AI prompts and conversation I used to build this?  
-Check out my [LinkedIn Post]([your-linkedin-post-link-here](https://www.linkedin.com/posts/abishgupta_every-morning-i-was-losing-3040-minutes-activity-7375038176706564096-J1QI?utm_source=share&utm_medium=member_desktop&rcm=ACoAAC3Ujl0BC5fyRLWZ_p4d8MVRxNVIIeE8m-0)) and comment **"Prompt"**.  
+Check out my [LinkedIn Post](https://www.linkedin.com/posts/abishgupta_every-morning-i-was-losing-3040-minutes-activity-7375038176706564096-J1QI/?utm_source=social_share_send&utm_medium=member_desktop_web&rcm=ACoAAC3Ujl0BC5fyRLWZ_p4d8MVRxNVIIeE8m-0) and comment **"Prompt"**.  
