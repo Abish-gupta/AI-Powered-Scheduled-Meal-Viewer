@@ -31,7 +31,7 @@ a **Scheduled Meal Viewer**.
 ---
 
 ### 🎯 Live Demo  
-👉 [Try the App Here](your-website-link-here)  
+👉 [Try the App Here](https://abish-gupta.github.io/AI-Powered-Scheduled-Meal-Viewer/)  
 
 ---
 
