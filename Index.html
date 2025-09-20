@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Muscle Gain Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+        
+        :root {
+            --background: #073B4C;
+            --highlight: #FFD166;
+            --accent: #06D6A0;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #94a3b8;
+            --surface: #1e293b;
+            --border: #334155;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--background);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .title {
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            font-weight: 900;
+            color: var(--text-primary);
+            line-height: 1.1;
+            margin-bottom: 1rem;
+        }
+
+        .subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* Mission Metrics */
+        .mission-metrics {
+            margin-bottom: 4rem;
+        }
+
+        .mission-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .metric-card {
+            background: var(--surface);
+            border: 2px solid var(--border);
+            border-radius: 1.5rem;
+            padding: 2.5rem 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--highlight), var(--accent));
+        }
+
+        .metric-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-xl);
+            border-color: var(--highlight);
+        }
+
+        .metric-emoji {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: var(--highlight);
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-label {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .achieved-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent);
+            margin-top: 1rem;
+            line-height: 1;
+        }
+
+        .achieved-label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+
+        /* Meal Ingredients */
+        .meal-ingredients {
+            margin-bottom: 4rem;
+        }
+
+        .ingredients-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .ingredients-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: center;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .ingredient-pill {
+            background: var(--surface);
+            border: 2px solid var(--border);
+            border-radius: 2rem;
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .ingredient-pill:hover {
+            transform: scale(1.05);
+            background: var(--accent);
+            border-color: var(--accent);
+            color: var(--background);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .ingredient-emoji {
+            font-size: 1.25rem;
+        }
+
+        /* Charts */
+        .charts {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        .chart-card {
+            background: var(--surface);
+            border: 2px solid var(--border);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .chart-card:hover {
+            border-color: var(--highlight);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .chart-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .chart-desc {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 300px;
+        }
+
+        /* Weekly Meal Plan */
+        .weekly-meal-plan {
+            margin-bottom: 4rem;
+        }
+
+        .weekly-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .weekly-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .refresh-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: var(--accent);
+            color: var(--background);
+            border: none;
+            border-radius: 2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .refresh-btn:hover {
+            background: var(--highlight);
+            transform: scale(1.05);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .refresh-icon {
+            font-size: 1.25rem;
+            transition: transform 0.3s ease;
+        }
+
+        .refresh-btn:hover .refresh-icon {
+            transform: rotate(180deg);
+        }
+
+        .day-selector {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+
+        .day-buttons {
+            display: flex;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            background: var(--surface);
+            border-radius: 1rem;
+            border: 2px solid var(--border);
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .day-btn {
+            padding: 0.75rem 1.25rem;
+            border: none;
+            border-radius: 0.75rem;
+            background: transparent;
+            color: var(--text-secondary);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .day-btn:hover {
+            background: var(--accent);
+            color: var(--background);
+            transform: scale(1.05);
+        }
+
+        .day-btn.active {
+            background: var(--highlight);
+            color: var(--background);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .meal-display {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .dish-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            text-align: center;
+            margin: 0;
+            line-height: 1.2;
+        }
+
+
+
+        /* Meal Protocol */
+        .meal-protocol {
+            margin-bottom: 4rem;
+        }
+
+        .protocol-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .protocol-desc {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+            text-align: center;
+            margin-bottom: 3rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .meals-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+        }
+
+        .beautiful-card {
+            background: linear-gradient(135deg, var(--surface) 0%, #2a3441 100%);
+            border: 2px solid var(--border);
+            border-radius: 2rem;
+            padding: 2.5rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s ease;
+        }
+
+        .beautiful-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--highlight), var(--accent));
+        }
+
+        .beautiful-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border-color: var(--highlight);
+        }
+
+        .meal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .meal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .meal-time {
+            background: var(--accent);
+            color: var(--background);
+            padding: 0.5rem 1rem;
+            border-radius: 1rem;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .ingredients-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        .ingredients-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .ingredient {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 3rem 0;
+            border-top: 2px solid var(--border);
+            margin-top: 4rem;
+        }
+
+        .footer-text {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .metrics-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .charts {
+                grid-template-columns: 1fr;
+            }
+
+            .ingredients-grid {
+                justify-content: flex-start;
+            }
+
+            .flow-steps {
+                max-width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 0.5rem;
+            }
+
+            .metric-card {
+                padding: 2rem 1.5rem;
+            }
+
+            .flow-step {
+                padding: 1.5rem;
+            }
+
+            .chart-card {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1 class="title">Your Muscle Gain Blueprint 💪</h1>
+            <p class="subtitle">A 7-day, 2-meal vegetarian protocol designed for maximum efficiency and results. 🥗</p>
+        </header>
+
+        <main>
+            <!-- Mission Metrics Section -->
+            <section class="mission-metrics">
+                <h2 class="mission-title">Mission Critical: Daily Targets 🎯</h2>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <span class="metric-emoji">🍽️</span>
+                        <div class="metric-value">2,800+</div>
+                        <div class="metric-label">Target Calories</div>
+                        <div class="achieved-value" id="achieved-calories">~2,250</div>
+                        <div class="achieved-label">Achieved Today</div>
+                    </div>
+                    <div class="metric-card">
+                        <span class="metric-emoji">🥦</span>
+                        <div class="metric-value">100g+</div>
+                        <div class="metric-label">Target Protein</div>
+                        <div class="achieved-value" id="achieved-protein">~93g</div>
+                        <div class="achieved-label">Achieved Today</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Charts & Analytics -->
+            <section class="charts">
+                <div class="chart-card">
+                    <h3 class="chart-title">Protein Distribution 🥦</h3>
+                    <p class="chart-desc">The Power Lunch delivers the majority of your daily protein.</p>
+                    <div class="chart-container">
+                        <canvas id="proteinChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <h3 class="chart-title">Weekly Calorie Intake 📊</h3>
+                    <p class="chart-desc">Daily calories are consistently within the optimal muscle-building range.</p>
+                    <div class="chart-container">
+                        <canvas id="calorieChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Weekly Meal Plan -->
+            <section class="weekly-meal-plan">
+                <div class="weekly-header">
+                    <h2 class="weekly-title">7-Day Power Lunch Matrix 📅</h2>
+                    <button class="refresh-btn" id="refresh-data" title="Refresh data from Google Sheets">
+                        <span class="refresh-icon">🔄</span>
+                        Refresh
+                    </button>
+                </div>
+                <div class="day-selector">
+                    <div class="day-buttons">
+                        <button class="day-btn active" data-day="monday">Monday</button>
+                        <button class="day-btn" data-day="tuesday">Tuesday</button>
+                        <button class="day-btn" data-day="wednesday">Wednesday</button>
+                        <button class="day-btn" data-day="thursday">Thursday</button>
+                        <button class="day-btn" data-day="friday">Friday</button>
+                        <button class="day-btn" data-day="saturday">Saturday</button>
+                        <button class="day-btn" data-day="sunday">Sunday</button>
+                    </div>
+                </div>
+                <div class="meal-display">
+                    <div class="meal-card">
+                        <h2 class="dish-title" id="dish-name">Super-Loaded Lentil & Veggie Bowl</h2>
+                    </div>
+                </div>
+            </section>
+
+            <!-- The 2-Meal Protocol -->
+            <section class="meal-protocol">
+                <h2 class="protocol-title">The 2-Meal Protocol 🍽️</h2>
+                <p class="protocol-desc">This plan is built on two high-impact meals to maximize your time while ensuring you hit your caloric and protein goals.</p>
+                
+                <div class="meals-grid">
+                    <div class="meal-card beautiful-card">
+                        <div class="meal-header">
+                            <h3 class="meal-title">Meal 1: Morning Power Up</h3>
+                            <div class="meal-time">⏰ 9:00 AM</div>
+                        </div>
+                        <p class="meal-desc">A fast, nutrient-dense shake to kickstart your day. Zero friction, maximum fuel.</p>
+                        <div class="meal-ingredients">
+                            <h4 class="ingredients-title">Ingredients:</h4>
+                            <div class="ingredients-list">
+                                <span class="ingredient">3 tbsp sattu</span>
+                                <span class="ingredient">250ml milk</span>
+                                <span class="ingredient">2 tbsp peanut butter</span>
+                                <span class="ingredient">1 handful almonds</span>
+                                <span class="ingredient">1 handful walnuts</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="meal-card beautiful-card">
+                        <div class="meal-header">
+                            <h3 class="meal-title">Meal 2: The Power Lunch</h3>
+                            <div class="meal-time">⏰ 2:00 PM</div>
+                        </div>
+                        <p class="meal-desc">A massive, calorie-loaded meal designed to keep you full and anabolic for the rest of the day.</p>
+                        <div class="meal-ingredients">
+                            <h4 class="ingredients-title">Today's power lunch:</h4>
+                            <div class="ingredients-list" id="power-lunch-ingredients">
+                                <span class="ingredient">1 cup cooked lentils</span>
+                                <span class="ingredient">1 cup mixed veggies</span>
+                                <span class="ingredient">1 cup chana</span>
+                                <span class="ingredient">1 cup tofu/paneer</span>
+                                <span class="ingredient">2 tbsp nuts</span>
+                                <span class="ingredient">1 tbsp seeds</span>
+                                <span class="ingredient">Oil-based dressing</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p class="footer-text">🚀 Consistency is your greatest asset. Execute the plan.</p>
+        </footer>
+    </div>
+
+    <script>
+        // Google Sheets configuration
+        const GOOGLE_SHEETS_ID = '12Id-jjM4niYL_3NSwe6GuwDeZN2D0_9lPql38YCNlSE';
+        // Using CSV export method (no API key needed)
+        const GOOGLE_SHEETS_CSV_URL = `https://docs.google.com/spreadsheets/d/${GOOGLE_SHEETS_ID}/export?format=csv&gid=0`;
+        
+        // Fallback meal data (in case API fails)
+        const fallbackMealData = {
+            'monday': {
+                dish: 'Super-Loaded Lentil & Veggie Bowl',
+                calories: '~1550',
+                protein: '~65g',
+                ingredients: ['1 cup cooked lentils', '1 cup mixed veggies (carrots, cucumber, cabbage)', '1 cup chana', '1 cup tofu/paneer', '2 tbsp nuts', '1 tbsp seeds', 'Oil-based dressing'],
+                videoUrl: 'https://youtube.com/watch?v=lentil-veggie-bowl'
+            },
+            'tuesday': {
+                dish: 'Monster Paneer & Sprout Salad',
+                calories: '~1650',
+                protein: '~73g',
+                ingredients: ['1 cup cooked sprouts', '1 cup paneer cubes', '1 cup mixed veggies', '1 cup boiled black chickpeas', '2 tbsp roasted nuts', '1 tbsp seeds', 'Oil-based dressing'],
+                videoUrl: 'https://youtube.com/watch?v=paneer-sprout-salad'
+            },
+            'wednesday': {
+                dish: 'Chhole & Veggie Power Bowl',
+                calories: '~1550',
+                protein: '~63g',
+                ingredients: ['1.5 cups chhole', '1 cup mixed veggies', '1 cup tofu/paneer', '2 tbsp nut butter', '1 tbsp seeds', 'Oil-based dressing'],
+                videoUrl: 'https://youtube.com/watch?v=chhole-veggie-bowl'
+            },
+            'thursday': {
+                dish: 'Calorie-Packed Quinoa & Rajma Salad',
+                calories: '~1650',
+                protein: '~68g',
+                ingredients: ['1 cup cooked quinoa', '1 cup rajma', '1 cup mixed veggies', '1 cup paneer', '2 tbsp nuts', '1 tbsp seeds', 'Oil-based dressing'],
+                videoUrl: 'https://youtube.com/watch?v=quinoa-rajma-salad'
+            },
+            'friday': {
+                dish: 'Super Tofu & Veggie Bowl',
+                calories: '~1650',
+                protein: '~78g',
+                ingredients: ['1.5 cups cooked tofu', '1 cup mixed veggies', '1 cup sprouts', '2 tbsp nuts', '1 tbsp seeds', 'Oil-based dressing'],
+                videoUrl: 'https://youtube.com/watch?v=tofu-veggie-bowl'
+            },
+            'saturday': {
+                dish: 'Big Bean & Corn Salad',
+                calories: '~1550',
+                protein: '~63g',
+                ingredients: ['1 cup cooked beans', '1 cup corn', '1 cup mixed veggies', '1 cup paneer', '2 tbsp nuts', '1 tbsp seeds', 'Oil-based dressing'],
+                videoUrl: 'https://youtube.com/watch?v=bean-corn-salad'
+            },
+            'sunday': {
+                dish: 'Mega Chickpea & Veggie Bowl',
+                calories: '~1750',
+                protein: '~68g',
+                ingredients: ['1.5 cups boiled chickpeas', '1 cup mixed veggies', '1 cup tofu', '2 tbsp nuts', '1 tbsp seeds', 'Oil-based dressing'],
+                videoUrl: 'https://youtube.com/watch?v=chickpea-veggie-bowl'
+            }
+        };
+
+        // Global variable to store meal data
+        let mealData = fallbackMealData;
+
+        // Sample data for charts
+        const proteinData = {
+            labels: ['Morning Power Up', 'Power Lunch'],
+            datasets: [{
+                data: [28, 65],
+                backgroundColor: ['#FFD166', '#06D6A0'],
+                borderColor: '#073B4C',
+                borderWidth: 3,
+                hoverOffset: 8
+            }]
+        };
+
+        const calorieData = {
+            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            datasets: [{
+                label: 'Total Daily Calories',
+                data: [2250, 2350, 2250, 2350, 2350, 2250, 2450],
+                borderColor: '#FFD166',
+                backgroundColor: 'rgba(255, 209, 102, 0.1)',
+                fill: true,
+                tension: 0.4,
+                pointBackgroundColor: '#FFD166',
+                pointBorderColor: '#073B4C',
+                pointHoverBackgroundColor: '#06D6A0',
+                pointHoverBorderColor: '#073B4C',
+                pointRadius: 6,
+                pointHoverRadius: 8,
+            }]
+        };
+
+        let currentDay = 'monday';
+
+        // Function to fetch data from Google Sheets (CSV method)
+        async function fetchMealDataFromSheets() {
+            try {
+                console.log('Fetching data from:', GOOGLE_SHEETS_CSV_URL);
+                const response = await fetch(GOOGLE_SHEETS_CSV_URL);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const csvText = await response.text();
+                console.log('CSV Response:', csvText);
+                
+                const lines = csvText.split('\n');
+                console.log('CSV Lines:', lines);
+                
+                if (lines.length < 2) {
+                    throw new Error('No data found in sheet');
+                }
+                
+                // Skip header row and process data
+                const newMealData = {};
+                for (let i = 1; i < lines.length; i++) {
+                    const line = lines[i].trim();
+                    if (line) {
+                        console.log('Processing line:', line);
+                        // Parse CSV line (handle commas within quoted fields)
+                        const row = parseCSVLine(line);
+                        console.log('Parsed row:', row);
+                        
+                        if (row.length >= 6) {
+                            const day = row[0].toLowerCase();
+                            const ingredients = row[4] ? row[4].split(',').map(ing => ing.trim()) : [];
+                            
+                            newMealData[day] = {
+                                dish: row[1] || '',
+                                calories: row[2] || '',
+                                protein: row[3] || '',
+                                ingredients: ingredients,
+                                videoUrl: row[5] || ''
+                            };
+                            
+                            console.log(`Added ${day}:`, newMealData[day]);
+                        }
+                    }
+                }
+                
+                console.log('Final meal data:', newMealData);
+                return newMealData;
+            } catch (error) {
+                console.error('Error fetching data from Google Sheets:', error);
+                return null;
+            }
+        }
+
+        // Helper function to parse CSV line (handles commas within quotes)
+        function parseCSVLine(line) {
+            const result = [];
+            let current = '';
+            let inQuotes = false;
+            
+            for (let i = 0; i < line.length; i++) {
+                const char = line[i];
+                
+                if (char === '"') {
+                    inQuotes = !inQuotes;
+                } else if (char === ',' && !inQuotes) {
+                    result.push(current.trim());
+                    current = '';
+                } else {
+                    current += char;
+                }
+            }
+            
+            result.push(current.trim());
+            return result;
+        }
+
+
+        // Function to load meal data (with fallback)
+        async function loadMealData() {
+            console.log('Loading meal data...');
+            
+            // Try to fetch from Google Sheets first
+            const sheetsData = await fetchMealDataFromSheets();
+            
+            if (sheetsData && Object.keys(sheetsData).length > 0) {
+                mealData = sheetsData;
+                console.log('✅ Data loaded from Google Sheets:', mealData);
+            } else {
+                mealData = fallbackMealData;
+                console.log('⚠️ Using fallback data (Google Sheets unavailable)');
+            }
+            
+            // Update the UI with the loaded data
+            updateMealDisplay(currentDay);
+        }
+
+        // Chart configuration
+        const chartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    labels: {
+                        color: '#f8fafc',
+                        font: {
+                            family: 'Inter',
+                            size: 14,
+                            weight: '600'
+                        }
+                    }
+                },
+                tooltip: {
+                    backgroundColor: '#1e293b',
+                    titleColor: '#f8fafc',
+                    bodyColor: '#cbd5e1',
+                    borderColor: '#FFD166',
+                    borderWidth: 2,
+                    cornerRadius: 8,
+                    titleFont: {
+                        family: 'Inter',
+                        size: 14,
+                        weight: '700'
+                    },
+                    bodyFont: {
+                        family: 'Inter',
+                        size: 13,
+                        weight: '500'
+                    }
+                }
+            }
+        };
+
+        const doughnutOptions = {
+            ...chartOptions,
+            cutout: '60%',
+            plugins: {
+                ...chartOptions.plugins,
+                legend: {
+                    ...chartOptions.plugins.legend,
+                    position: 'bottom'
+                }
+            }
+        };
+
+        const lineOptions = {
+            ...chartOptions,
+            scales: {
+                y: {
+                    beginAtZero: false,
+                    min: 2000,
+                    max: 2500,
+                    ticks: { 
+                        color: '#94a3b8',
+                        font: {
+                            family: 'Inter',
+                            size: 12,
+                            weight: '500'
+                        }
+                    },
+                    grid: { 
+                        color: 'rgba(148, 163, 184, 0.1)',
+                        drawBorder: false
+                    }
+                },
+                x: {
+                    ticks: { 
+                        color: '#94a3b8',
+                        font: {
+                            family: 'Inter',
+                            size: 12,
+                            weight: '500'
+                        }
+                    },
+                    grid: { display: false }
+                }
+            }
+        };
+
+        // Function to update meal display based on selected day
+        function updateMealDisplay(day) {
+            console.log('Updating meal display for day:', day);
+            console.log('Current mealData:', mealData);
+            
+            currentDay = day;
+            const meal = mealData[day];
+            
+            if (!meal) {
+                console.error('No meal data found for day:', day);
+                return;
+            }
+            
+            console.log('Meal data for', day, ':', meal);
+            
+            // Update active day button
+            document.querySelectorAll('.day-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            const activeBtn = document.querySelector(`[data-day="${day}"]`);
+            if (activeBtn) {
+                activeBtn.classList.add('active');
+            }
+            
+            // Update meal information
+            const dishNameEl = document.getElementById('dish-name');
+            if (dishNameEl) {
+                dishNameEl.textContent = meal.dish;
+            }
+            
+            // Update achieved values (morning shake + power lunch)
+            const totalCalories = 700 + parseInt(meal.calories.replace('~', ''));
+            const totalProtein = 28 + parseInt(meal.protein.replace('~', '').replace('g', ''));
+            
+            const achievedCaloriesEl = document.getElementById('achieved-calories');
+            const achievedProteinEl = document.getElementById('achieved-protein');
+            
+            if (achievedCaloriesEl) {
+                achievedCaloriesEl.textContent = `~${totalCalories}`;
+            }
+            if (achievedProteinEl) {
+                achievedProteinEl.textContent = `~${totalProtein}g`;
+            }
+            
+            // Update power lunch ingredients with raw data from Google Sheet
+            const ingredientsContainer = document.getElementById('power-lunch-ingredients');
+            if (ingredientsContainer && meal.ingredients) {
+                ingredientsContainer.innerHTML = meal.ingredients.map(ingredient => 
+                    `<span class="ingredient">${ingredient}</span>`
+                ).join('');
+            }
+            
+            console.log('Meal display updated successfully');
+        }
+
+        // Initialize charts when DOM is loaded
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('DOM loaded, initializing...');
+            
+            // Start with fallback data to ensure day selection works
+            mealData = fallbackMealData;
+            console.log('Using fallback data initially:', mealData);
+            
+            // Update UI with fallback data
+            updateMealDisplay(currentDay);
+            
+            // Try to load from Google Sheets in background
+            try {
+                await loadMealData();
+            } catch (error) {
+                console.error('Error loading data from sheets:', error);
+            }
+            
+            // Protein Distribution Chart (Doughnut)
+            const proteinCtx = document.getElementById('proteinChart').getContext('2d');
+            new Chart(proteinCtx, {
+                type: 'doughnut',
+                data: proteinData,
+                options: doughnutOptions
+            });
+
+            // Weekly Calorie Intake Chart (Line)
+            const calorieCtx = document.getElementById('calorieChart').getContext('2d');
+            new Chart(calorieCtx, {
+                type: 'line',
+                data: calorieData,
+                options: lineOptions
+            });
+
+            // Add event listeners for day buttons
+            document.querySelectorAll('.day-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const day = this.getAttribute('data-day');
+                    console.log('Day button clicked:', day);
+                    updateMealDisplay(day);
+                });
+            });
+
+            // Add event listener for refresh button
+            document.getElementById('refresh-data').addEventListener('click', async function() {
+                this.disabled = true;
+                this.innerHTML = '<span class="refresh-icon">⏳</span> Loading...';
+                
+                await loadMealData();
+                
+                this.disabled = false;
+                this.innerHTML = '<span class="refresh-icon">🔄</span> Refresh';
+            });
+            
+            console.log('Initialization complete');
+        });
+    </script>
+</body>
+</html>
